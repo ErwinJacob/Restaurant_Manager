@@ -15,14 +15,50 @@
      var body: some View {
          GeometryReader{ proxy in
              VStack{
-
-                 Button("Add Restaurant"){
-                     Task{
-                         if await user.createRestaurant(restaurantName: "Nowa"){
-                             await user.fetchRestaurants()
+                 
+                 HStack{
+                     Button {
+                         view.changeView(newView: Views.loginView)
+                         user.logout()
+                     } label: {
+                         Image(systemName: "arrowshape.backward.fill")
+                             .resizable()
+                             .foregroundColor(Color.primary)
+                     }
+                     .frame(width: proxy.size.height*0.035, height: proxy.size.height*0.035)
+                     
+                     Spacer()
+                     
+                     Text(":)))")
+                         .bold()
+                         .font(.system(size: min(proxy.size.width, proxy.size.height) * 0.075))
+                     
+                     Spacer()
+                     
+                     VStack{
+                         Button {
+                             Task{
+                                 if await user.createRestaurant(restaurantName: "Nowa"){
+                                     await user.fetchRestaurants()
+                                 }
+                             }
+                         } label: {
+                             Image(systemName: "plus")
+                                 .resizable()
+                                 .foregroundColor(Color.primary)
                          }
+                         .frame(width: proxy.size.height*0.035, height: proxy.size.height*0.035)
+
                      }
                  }
+                 .frame(width: proxy.size.width*0.85, height: proxy.size.height*0.05)
+
+                 Spacer()
+
+                 Divider()
+
+                 
+                 
 
                  Spacer()
 
