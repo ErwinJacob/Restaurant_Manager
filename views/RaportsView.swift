@@ -15,16 +15,20 @@ struct RaportsView: View {
     
     @State var raport: DayRaport? = nil
     
-    @State var errorMsg: String = ":)"
+    @State var errorMsg: String = ""
+    
+    @State var showDatePicker: Bool = false
     
     var body: some View {
         GeometryReader{ proxy in
             VStack{
 
+                Spacer()
+                
                 if raport != nil {
                     // Render UI when the raport is available
 //                    Text("Raport is available")
-                    RaportDayView(raport: raport!, signature: user.signature)
+                    RaportDayView(restaurant: restaurant, raport: raport!, user: user)
                 } else {
                     // Render UI when the raport is not available
                     Text("Day not opened yet.")
@@ -54,21 +58,65 @@ struct RaportsView: View {
                     
                 Spacer()
                 
-                DatePicker(
-                    selection: $raportDay,
-                    in: Calendar.current.date(from: DateComponents(year: 2023, month: 9, day: 25))!...,
-                    displayedComponents: .date
-                ){
-                    Text("Raport from day")
-                        .bold()
+                Button {
+                    showDatePicker = true
+                } label: {
+                    ZStack{
+                        RoundedRectangle(cornerRadius: 15)
+                            .opacity(0.1)
+                            .foregroundColor(Color.primary)
+                        Text(formattedDate(raportDay))
+                            .foregroundColor(Color.primary)
+                            .bold()
+                    }
+                    .frame(width: proxy.size.width*0.6, height: proxy.size.height*0.075)
                 }
-                .datePickerStyle(.compact) // Optional, use compact style for a smaller picker
-                .padding(.horizontal, proxy.size.width*0.15)
                 .padding(.bottom, proxy.size.height*0.025)
-                .onChange(of: raportDay) { newDate in
-                    // When DatePicker value changes, refresh the view
-                    refreshView()
+                .sheet(isPresented: $showDatePicker) {
+                    showDatePicker = false
+                } content: {
+                    VStack{
+                        
+                        Spacer()
+                        
+                        DatePicker(
+                            selection: $raportDay,
+                            in: restaurant.firstIssue!...Date.now,
+                            displayedComponents: .date
+                        ){
+                            Text("Raport from day")
+                                .bold()
+                        }
+                        .datePickerStyle(.graphical) // Optional, use compact style for a smaller picker
+                        .labelsHidden()
+                        .padding(.horizontal, proxy.size.width*0.15)
+                        .padding(.bottom, proxy.size.height*0.025)
+                        .onChange(of: raportDay) { newDate in
+                            // When DatePicker value changes, refresh the view
+                            refreshView()
+                        }
+                        
+                        Spacer()
+                        
+                        Button {
+                            showDatePicker = false
+                        } label: {
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 15)
+                                    .foregroundColor(Color.green)
+                                Text("Zatwierdź")
+                                    .foregroundColor(Color.primary)
+                                    .bold()
+                            }
+                        }
+                        .frame(width: proxy.size.width*0.6, height: proxy.size.height*0.075)
+
+                        
+                        Spacer()
+                        
+                    }
                 }
+
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
             .onAppear {
@@ -76,6 +124,13 @@ struct RaportsView: View {
                 refreshView()
             }
         }
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMMM yyyy"
+        formatter.locale = Locale(identifier: "pl_PL") // Set the locale to Polish
+        return formatter.string(from: date)
     }
     
     private func refreshView() {

@@ -39,10 +39,10 @@ struct Login_Page: View {
                                     isRegisterActive = false
                                 } label: {
                                     if isLoginActive{
-                                        LoginLabel(text: "Login", textColor: Color(red: 239/265, green: 87/265, blue: 124/265))
+                                        LoginLabel(text: "Logowanie", textColor: Color(red: 239/265, green: 87/265, blue: 124/265))
                                     }
                                     else{
-                                        LoginLabel(text: "Login", textColor: Color(UIColor.label))
+                                        LoginLabel(text: "Logowanie", textColor: Color(UIColor.label))
                                     }
                                 }
                                 .padding(.trailing, 15)
@@ -52,10 +52,10 @@ struct Login_Page: View {
                                     isRegisterActive = true
                                 } label: {
                                     if isRegisterActive{
-                                        LoginLabel(text: "Register", textColor: Color(red: 239/265, green: 87/265, blue: 124/265))
+                                        LoginLabel(text: "Rejestracja", textColor: Color(red: 239/265, green: 87/265, blue: 124/265))
                                     }
                                     else{
-                                        LoginLabel(text: "Register", textColor: Color(UIColor.label))
+                                        LoginLabel(text: "Rejestracja", textColor: Color(UIColor.label))
                                     }
                                 }
                                 .padding(.leading, 15)
@@ -104,6 +104,13 @@ struct Login_Page: View {
 
                             Spacer()
 
+//                            Button("TEST - Log in offline"){
+//                                user.restaurants.append(Restaurant(id: "00000", role: "admin"))
+//                                view.changeView(newView: Views.restaurantsList)
+//
+//                            }
+                            
+                            
                             Button {
                                 //login
                                 if isLoginActive{

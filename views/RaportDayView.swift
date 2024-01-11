@@ -9,6 +9,8 @@ import SwiftUI
 
 struct RaportDayView: View {
     
+    @State var restaurant: Restaurant
+
     @ObservedObject var raport: DayRaport
     
     @State private var showTakings: Bool = false
@@ -16,7 +18,7 @@ struct RaportDayView: View {
     @State private var showIncomes: Bool = false
     @State private var showWorkingTimes: Bool = false
     
-    @State var signature: String
+    @State var user: UserData
 
     
     var body: some View {
@@ -31,7 +33,7 @@ struct RaportDayView: View {
                             .foregroundColor(Color.primary)
                             .opacity(0.1)
                         VStack{
-                            Text("Takings")
+                            Text("Utarg")
                                 .foregroundColor(Color.primary)
                                 .bold()
                             Text(getCleanString(value: String(raport.getTopTakings())))
@@ -46,7 +48,7 @@ struct RaportDayView: View {
                     showTakings = false
                 }, content: {
 //                    TakingsView(raport: raport, signature: signature)
-                    ExpensesView(raport: raport, signature: signature, useCase: "Takings")
+                    ExpensesView(raport: raport, signature: user.signature, useCase: "Utarg")
 
                 })
             
@@ -59,10 +61,10 @@ struct RaportDayView: View {
                             .foregroundColor(Color.primary)
                             .opacity(0.1)
                         VStack{
-                            Text("Expenses")
+                            Text("Wydatki")
                                 .foregroundColor(Color.primary)
                                 .bold()
-                            Text(String(raport.sumExpenses()))
+                            Text(getCleanString(value: String(raport.sumExpenses())))
                                 .foregroundColor(Color.primary)
 
                         }
@@ -73,7 +75,7 @@ struct RaportDayView: View {
                 .sheet(isPresented: $showExpenses, onDismiss: {
                     showExpenses = false
                 }, content: {
-                    ExpensesView(raport: raport, signature: signature, useCase: "Expenses")
+                    ExpensesView(raport: raport, signature: user.signature, useCase: "Wydatki")
                 })
 
                 Button {
@@ -84,10 +86,10 @@ struct RaportDayView: View {
                             .foregroundColor(Color.primary)
                             .opacity(0.1)
                         VStack{
-                            Text("Incomes")
+                            Text("Wpłaty")
                                 .foregroundColor(Color.primary)
                                 .bold()
-                            Text(String(raport.sumIncomes()))
+                            Text(getCleanString(value: String(raport.sumIncomes())))
                                 .foregroundColor(Color.primary)
 
                         }
@@ -98,7 +100,7 @@ struct RaportDayView: View {
                 .sheet(isPresented: $showIncomes, onDismiss: {
                     showIncomes = false
                 }, content: {
-                    ExpensesView(raport: raport, signature: signature, useCase: "Incomes")
+                    ExpensesView(raport: raport, signature: user.signature, useCase: "Wpłaty")
                 })
                 
                 Button {
@@ -109,7 +111,7 @@ struct RaportDayView: View {
                             .foregroundColor(Color.primary)
                             .opacity(0.1)
                         VStack{
-                            Text("Workers this day")
+                            Text("Pracownicy")
                                 .foregroundColor(Color.primary)
                                 .bold()
                             Text(String(raport.sumWorkers()))
@@ -123,7 +125,7 @@ struct RaportDayView: View {
                 .sheet(isPresented: $showWorkingTimes, onDismiss: {
                     showWorkingTimes = false
                 }, content: {
-                    
+                    RaportPersonnelView(restaurant: restaurant, raport: raport, user: user)
                 })
 
             }
@@ -134,11 +136,3 @@ struct RaportDayView: View {
 }
 
 
-//
-//struct TimePickerView: View {
-//    @Binding var selectedTime: Date
-//
-//    var body: some View {
-//        DatePicker("Select a Time", selection: $selectedTime, displayedComponents: [.hourAndMinute])
-//    }
-//}

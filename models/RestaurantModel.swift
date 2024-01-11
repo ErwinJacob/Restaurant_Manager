@@ -12,15 +12,17 @@
 
      let id: String
      @Published var name: String = ""
+     @Published var firstIssue: Date?
      @Published var employees: [Employee] = []
 //     @Published var dayRaports: [DayRaport] = []
      @Published var invoiceManager: [Company] = []
-     @Published var userRole: String
+     
+     @Published var logedUserRole: String //TODO: ??????
 
      @MainActor
      init(id: String, role: String){//}, name: String) {
          self.id = id
-         self.userRole = role
+         self.logedUserRole = role
          Task{
              await self.fetchRestaurantData()
              await self.fetchEmployees()
@@ -29,6 +31,10 @@
          }
      }
 
+     
+     func isAdmin() -> Bool{
+         return logedUserRole == "admin"
+     }
      
      func startDay(date: Date, ignoreDate: Bool = false) -> Bool{
          
@@ -73,11 +79,21 @@
      
      func getEmployee(employeeID: String) -> Employee? {
 
-         print(self.employees)
-
          return self.employees.first { emp in
              emp.id == employeeID
          }
+     }
+     
+     func getEmployeeName(employeeID: String) -> String?{
+         var empName: String? = nil
+         
+         self.employees.forEach { emp in
+             if emp.id == employeeID{
+                 empName = emp.name
+             }
+         }
+         
+         return empName
      }
 
      func deleteEmployee(employeeID: String) async -> Bool{
@@ -142,8 +158,9 @@
                  let doc = try await db.collection("Restaurants").document(self.id).getDocument()
                  doc.data().map { data in
                      DispatchQueue.main.async {
-                                     self.name = data["name"] as? String ?? "missing name"
-                                 }
+                         self.name = data["name"] as? String ?? "missing name"
+                         self.firstIssue = stringToDate(dateString: data["firstIssue"] as? String ?? "2001-01-01")
+                     }
 
                  }
              }
@@ -159,7 +176,7 @@
          do{
              let docs = try await db.collection("Restaurants").document(self.id).collection("Employees").getDocuments()
              self.employees = docs.documents.map({ data in
-                 return Employee(id: data.documentID, name: data["name"] as? String ?? "name missing", salary: data["salary"] as? String ?? "Salary missing", role: data["role"] as? String ?? "unknown")
+                 return Employee(id: data.documentID, name: data["name"] as? String ?? "name missing", salary: data["salary"] as? String ?? "Salary missing", role: data["role"] as? String ?? "unknown", restaurantId: self.id)
              })
  //            return true
          }
@@ -169,14 +186,43 @@
          }
      }
 
-//     @MainActor
-//     func fetchDayRaports() async{
-//
-//     }
 
      @MainActor
      func fetchInvoiceManager() async{
-
+         
+         let db = Firestore.firestore()
+         
+         
+         do{
+             self.invoiceManager = try await db.collection("Restaurants").document(self.id).collection("InvoiceManager").getDocuments().documents.map({ doc in
+                 return Company(name: doc.documentID,
+                                restaurantId: self.id,
+                                description: doc["description"] as? String ?? ""
+                 )
+             })
+         }
+         catch{
+             print("ERROR fetchInvoiceManager")
+         }
+     }
+     
+     @MainActor
+     func addInvoiceCompany(name: String, descritpion: String) async{
+         
+         let newCompany = Company(name: name, restaurantId: self.id, description: descritpion)
+         self.invoiceManager.append(newCompany)
+         
+         let db = Firestore.firestore()
+         do{
+             try await db.collection("Restaurants").document(self.id).collection("InvoiceManager").document(newCompany.name).setData([
+                "description": newCompany.description
+             ])
+//             return newCompany
+         }
+         catch{
+             print("ERROR")
+//             return nil
+         }
      }
 
      func getMonthRaports(){
@@ -194,26 +240,6 @@
  }
 
 
-
-
- class WorkTime: Identifiable{
-     let year: String
-     let month: String
-     let dat: String
-     @Published var startTime: String
-     @Published var endTime: String?
-     @Published var totalTimeWorked: String?
-
-     init(year: String, month: String, dat: String, startTime: String, endTime: String? = nil, totalTimeWorked: String? = nil) {
-         self.year = year
-         self.month = month
-         self.dat = dat
-         self.startTime = startTime
-         self.endTime = endTime
-         self.totalTimeWorked = totalTimeWorked
-     }
-
- }
 
 
 

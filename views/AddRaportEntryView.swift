@@ -19,24 +19,51 @@ struct AddRaportEntryView: View{
     var body: some View{
         GeometryReader{ proxy in
             VStack{
-                Text("Add new entry")
-                    .bold()
-                    .font(.largeTitle)
+                if useCase == "Wydatki"{
+                    Text("Dodaj nowy wydatek")
+                        .bold()
+                        .font(.largeTitle)
+                }
+                else if useCase == "Wpłaty"{
+                    Text("Dodaj nową wpłatę")
+                        .bold()
+                        .font(.largeTitle)
+
+                }
+                else if useCase == "Utarg"{
+                    Text("Dodaj aktualny utarg")
+                        .bold()
+                        .font(.largeTitle)
+
+                }
+                else{
+                    Text("Błąd")
+                        .bold()
+                        .font(.largeTitle)
+                }
                 
-                DatePicker("Select a Time", selection: $selectedTime, displayedComponents: [.hourAndMinute])
+                
+                DatePicker("Wybierz godzinę", selection: $selectedTime, displayedComponents: [.hourAndMinute])
                     .frame(width: proxy.size.width*0.7)
                 
-                TextField("Enter a number", text: $newValue)
+                TextField("Kwota", text: $newValue)
                     .keyboardType(.decimalPad)
                     .textFieldStyle(.roundedBorder)
                     .frame(width: proxy.size.width*0.5, height: proxy.size.height*0.1)
                 
-                if useCase == "Expenses" || useCase == "Incomes"{
-                    TextField("Label", text: $label)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: proxy.size.width*0.5, height: proxy.size.height*0.1)
+                if useCase == "Wydatki" || useCase == "Wpłaty"{
+                    if useCase == "Wydatki"{
+                        TextField("Powód wydatku", text: $label)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: proxy.size.width*0.5, height: proxy.size.height*0.1)
+                    }
+                    else{
+                        TextField("Powód wpłaty", text: $label)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: proxy.size.width*0.5, height: proxy.size.height*0.1)
+                    }
                     
-                    TextField("Description", text: $description)
+                    TextField("Opis (opcjonalny)", text: $description)
                         .textFieldStyle(.roundedBorder)
                         .frame(width: proxy.size.width*0.5, height: proxy.size.height*0.1)
                 }
@@ -53,15 +80,15 @@ struct AddRaportEntryView: View{
                     //format value
                     let valueString = getCleanString(value: newValue)
                     
-                    if useCase == "Takings"{
+                    if useCase == "Utarg"{
                         raport.addTakings(time: timeString,
                                           value: valueString,
                                           signature: signature)
                     }
-                    else if useCase == "Expenses"{
+                    else if useCase == "Wydatki"{
                         raport.addExpense(signature: signature, value: valueString, description: description, name: label, time: timeString)
                     }
-                    else if useCase == "Incomes"{
+                    else if useCase == "Wpłaty"{
                         raport.addIncome(signature: signature, value: valueString, description: description, name: label, time: timeString)
                     }
                     else{
@@ -71,9 +98,9 @@ struct AddRaportEntryView: View{
                 } label: {
                     ZStack{
                         RoundedRectangle(cornerRadius: 15)
-                            .frame(width: proxy.size.width*0.4, height: proxy.size.height*0.1)
+                            .frame(width: proxy.size.width*0.6, height: proxy.size.height*0.065)
                             .foregroundColor(.green)
-                        Text("Submit")
+                        Text("Potwierdź")
                             .bold()
                             .font(.title2)
                             .foregroundStyle(.white)

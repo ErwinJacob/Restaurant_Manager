@@ -59,7 +59,6 @@ struct RestaurantView: View {
 
                 switch restaurantViewController.view{
                 case RestaurantViews.employees:
-
                     EmployeesView(user: user, restaurant: restaurant)
                         .frame(width: proxy.size.width, height: proxy.size.height*0.85)
 
@@ -68,9 +67,9 @@ struct RestaurantView: View {
                         .frame(width: proxy.size.width, height: proxy.size.height*0.85)
 
                 case RestaurantViews.invoice:
-                    InvoiceManagerView()
+                    InvoiceManagerView(restaurant: restaurant, signature: user.signature)
                         .frame(width: proxy.size.width, height: proxy.size.height*0.85)
-
+                    
                 default:
                     VStack{
                         Text("view controller error")
@@ -96,7 +95,7 @@ struct RestaurantView: View {
 
                                     Spacer()
 
-                                    Text("Employees")
+                                    Text("Pracownicy")
                                         .font(.system(size: min(proxy.size.width, proxy.size.height) * 0.03))
 
                                     Spacer()
@@ -112,7 +111,7 @@ struct RestaurantView: View {
 
                                     Spacer()
 
-                                    Text("Employees")
+                                    Text("Pracownicy")
                                         .font(.system(size: min(proxy.size.width, proxy.size.height) * 0.03))
 
                                     Spacer()
@@ -140,7 +139,7 @@ struct RestaurantView: View {
 
                                     Spacer()
 
-                                    Text("Raports")
+                                    Text("Raporty")
                                         .font(.system(size: min(proxy.size.width, proxy.size.height) * 0.03))
 
                                     Spacer()
@@ -156,7 +155,7 @@ struct RestaurantView: View {
 
                                     Spacer()
 
-                                    Text("Raports")
+                                    Text("Raporty")
                                         .font(.system(size: min(proxy.size.width, proxy.size.height) * 0.03))
 
                                     Spacer()
@@ -184,7 +183,7 @@ struct RestaurantView: View {
 
                                     Spacer()
 
-                                    Text("Invoices")
+                                    Text("Faktury")
                                         .font(.system(size: min(proxy.size.width, proxy.size.height) * 0.03))
 
                                     Spacer()
@@ -199,7 +198,7 @@ struct RestaurantView: View {
 
                                     Spacer()
 
-                                    Text("Invoices")
+                                    Text("Faktury")
                                         .font(.system(size: min(proxy.size.width, proxy.size.height) * 0.03))
 
                                     Spacer()
@@ -224,68 +223,3 @@ struct RestaurantView: View {
         .navigationTitle(restaurant.name)
     }
 }
-//            VStack{
-//
-//                Spacer()
-//
-//                TextField("user id", text: $searchedUser)
-//                    .frame(width: proxy.size.width*0.6)
-//                    .textFieldStyle(.roundedBorder)
-//
-//                Button("Search"){
-//                    if searchedUser != ""{
-//                        Task{
-//                            await user.findUserByShortenedId(shortenedId: searchedUser) { result in
-//                                resultOfSearch = result
-//                                if result != ""{
-//                                    Task{
-//                                        if await restaurant.inviteEmployee(userId: result){
-//                                            showAlert = true
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                .bold()
-//                .alert(isPresented: $showAlert) {
-//                    Alert(title: Text("Result of search"),
-//                    message: Text(resultOfSearch),
-//                    dismissButton: .default(Text("Ok ;p")))
-//                }
-//
-//                Spacer()
-//
-//                Text(restaurant.id)
-//                    .font(.footnote)
-//
-//                RestaurantNavigationBar(restaurantViewController: restaurantViewController)
-//                    .frame(width: proxy.size.width, height: proxy.size.height*0.1)
-//            }
-//            .frame(width: proxy.size.width, height: proxy.size.height)
-//        }
-//
-//}
-
-
-
-/* user searcher
- TextField("user id", text: $searchedUser)
- Button("Search"){
-     if searchedUser != ""{
-         Task{
-             await user.findUserByShortenedId(shortenedId: searchedUser) { result in
-                 resultOfSearch = result
-                 print(result)
-                 showAlert = true
-             }
-         }
-     }
- }
- .alert(isPresented: $showAlert) {
-     Alert(title: Text("Result of search"),
-     message: Text(resultOfSearch),
-     dismissButton: .default(Text("Ok ;p")))
- }
- */

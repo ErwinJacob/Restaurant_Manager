@@ -68,7 +68,7 @@ class UserData: Identifiable, ObservableObject{
 
     }
 
-    func findUserByShortenedId(shortenedId: String, employee: @escaping (Employee) -> Void) async{
+    func findUserByShortenedId(restaurantId: String, shortenedId: String, employee: @escaping (Employee) -> Void) async{
 
         let db = Firestore.firestore()
         do{
@@ -78,7 +78,7 @@ class UserData: Identifiable, ObservableObject{
                 if checkedId == shortenedId{
                     print("Found user: \(data.documentID)")
 
-                    let foundEmployee: Employee = Employee(id: data.documentID, name: data["signature"] as? String ?? "Name missing", salary: "0", role: "")
+                    let foundEmployee: Employee = Employee(id: data.documentID, name: data["signature"] as? String ?? "Name missing", salary: "0", role: "", restaurantId: restaurantId)
                     employee(foundEmployee)
                 }
             }
@@ -94,6 +94,9 @@ class UserData: Identifiable, ObservableObject{
 
     @MainActor
     @Sendable func fetchRestaurants() async -> Bool{
+        
+        self.restaurants = []
+        
         if let userData = self.data{
             let db = Firestore.firestore()
             do{
@@ -132,8 +135,8 @@ class UserData: Identifiable, ObservableObject{
             let authDataResult = try await Auth.auth().signIn(withEmail: self.email, password: self.password)
             data = authDataResult.user
             self.isLogged = true
-
-            if await self.fetchData(){ //!!!!!!!!!!!!!!!!!!!!!!! TODO: test
+            
+            if await self.fetchData(){ 
                 return true
             }
             else{
@@ -189,9 +192,18 @@ class UserData: Identifiable, ObservableObject{
             let db = Firestore.firestore()
             do{
                 try await db.collection("Restaurants").document(restaurantId).setData(
-                    ["name": restaurantName]
+                    ["name": restaurantName,
+                     "firstIssue": dateToString(date: Date())
+                    ]
                 )
 
+                try await db.collection("Restaurants").document(restaurantId).collection("Employees").document(userData.uid).setData([
+                    "role" : "admin",
+                    "salary" : "0",
+                    "name": self.signature
+                ])
+
+                
                 try await db.collection("Users").document(userData.uid).collection("Restaurants").document(restaurantId).setData([
                     "role" : "admin"
                 ])
@@ -236,6 +248,7 @@ class UserData: Identifiable, ObservableObject{
             self.password = ""
             self.errorMessage = ""
             self.isLogged = false
+            self.restaurants = []
         }
         catch{
             print("ERROR - logout")
